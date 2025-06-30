@@ -1,0 +1,26 @@
+server:
+  port: 8081
+
+spring:
+  config:
+    activate:
+      on-profile: local
+  application:
+    name: controller-service
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://localhost:5432/controller-msa
+    username: postgres
+    password: 1696435
+  jpa:
+    database: postgresql
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    generate-ddl: true
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+
+eureka:
+  client:
+    register-with-eureka: false
+    fetch-registry: false
