@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>에어컨 제어 데모</title>
+  <style>
+    body {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      background: #f7f9fa;
+      font-family: 'Noto Sans KR', sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+    .aircon-img {
+      width: 200px;
+      margin: 40px 0 20px 0;
+      filter: drop-shadow(0 2px 12px #bbb);
+    }
+    .button-group {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+    .state-box, .temp-box, .wind-box {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      margin-bottom: 10px;
+      font-size: 1.15em;
+    }
+    button {
+      padding: 10px 16px;
+      font-size: 1em;
+      border-radius: 6px;
+      border: none;
+      background: #3399ff;
+      color: white;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    button:hover {
+      background: #237be3;
+    }
+    .chat-box {
+      width: 350px;
+      height: 200px;
+      background: white;
+      border-radius: 10px;
+      border: 1px solid #dde3ea;
+      margin-top: 24px;
+      padding: 16px;
+      overflow-y: auto;
+      font-size: 0.95em;
+      box-shadow: 0 2px 12px #eee;
+    }
+    .chat-msg {
+      margin-bottom: 6px;
+    }
+  </style>
+</head>
+<body>
+<img class="aircon-img" src="img/air-conditioner.png" alt="에어컨 이미지">
+<div class="button-group">
+  <button onclick="powerToggle()">전원</button>
+</div>
+<div class="state-box">
+  에어컨 상태: <span id="state">OFF</span>
+</div>
+<div class="button-group">
+  <button onclick="tempDown()">온도 ▼</button>
+  <span class="temp-box">온도: <span id="temp">24</span> ℃</span>
+  <button onclick="tempUp()">온도 ▲</button>
+</div>
+<div class="button-group">
+  <button onclick="windDown()">바람 ▼</button>
+  <span class="wind-box">바람 세기: <span id="wind">2</span></span>
+  <button onclick="windUp()">바람 ▲</button>
+</div>
+<div class="chat-box" id="chatBox">
+  <!-- 대화 메시지 출력 -->
+</div>
+
+<script>
+
+  document.addEventListener('DOMContentLoaded', () => {
+    let host = window.location.host;
+    let protocol = window.location.protocol === 'https:' ? 'wss://' : 'ws://';
+    let wsUrl = `${protocol}${host}/ws`;
+
+    // WebSocket 연결 (실제 환경에서는 서버 URL에 맞게 수정 필요)
+    const ws = new WebSocket(wsUrl);
+    ws.onopen = () => {
+      console.log('WebSocket 연결 성공');
+      addChat('서버에 연결되었습니다.');
+    };
+
+  });
+
+  // (실제 환경에서는 WebSocket 연결 후 메시지 송수신 처리)
+  let state = 'OFF';
+  let temp = 24;
+  let wind = 2;
+
+  function addChat(msg) {
+    const chatBox = document.getElementById('chatBox');
+    const div = document.createElement('div');
+    div.className = 'chat-msg';
+    div.textContent = msg;
+    chatBox.appendChild(div);
+    chatBox.scrollTop = chatBox.scrollHeight;
+  }
+
+  function updateView() {
+    document.getElementById('state').textContent = state;
+    document.getElementById('temp').textContent = temp;
+    document.getElementById('wind').textContent = wind;
+  }
+
+  function powerToggle() {
+    state = (state === 'ON') ? 'OFF' : 'ON';
+    addChat(`전원 버튼을 눌러 에어컨을 ${state}으로 변경했습니다.`);
+    updateView();
+    // WebSocket/SSE 등으로 서버에 명령 전송 로직 추가!
+  }
+
+  function tempUp() {
+    if (state === 'ON') {
+      temp++;
+      addChat(`온도를 ${temp}℃로 올렸습니다.`);
+      updateView();
+    }
+  }
+
+  function tempDown() {
+    if (state === 'ON') {
+      temp--;
+      addChat(`온도를 ${temp}℃로 내렸습니다.`);
+      updateView();
+    }
+  }
+
+  function windUp() {
+    if (state === 'ON' && wind < 5) {
+      wind++;
+      addChat(`바람 세기를 ${wind}로 올렸습니다.`);
+      updateView();
+    }
+  }
+
+  function windDown() {
+    if (state === 'ON' && wind > 1) {
+      wind--;
+      addChat(`바람 세기를 ${wind}로 내렸습니다.`);
+      updateView();
+    }
+  }
+
+  // 실제 실시간 메시지 수신(WebSocket/SSE)은 아래에 추가!
+  // 예: addChat("서버로부터 알림: ...");
+</script>
+</body>
+</html>

@@ -2,19 +2,25 @@ package com.duhyeon.controlservice.service.impl;
 
 import com.duhyeon.controlservice.domain.AirCondition;
 import com.duhyeon.controlservice.dto.AirConditionResponseDTO;
+import com.duhyeon.controlservice.handler.KafkaProducerHandler;
 import com.duhyeon.controlservice.repository.AirConditionRepository;
 import com.duhyeon.controlservice.service.ControlService;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.HashMap;
 
 @Service
 public class ControlServiceImpl implements ControlService {
 
-    private final AirConditionRepository airConditionRepository;
 
-    public ControlServiceImpl(AirConditionRepository airConditionRepository) {
+    private final AirConditionRepository airConditionRepository;
+    private final KafkaProducerHandler kafkaProducerHandler;
+    public ControlServiceImpl(AirConditionRepository airConditionRepository, KafkaProducerHandler kafkaProducerHandler) {
         this.airConditionRepository = airConditionRepository;
+        this.kafkaProducerHandler = kafkaProducerHandler;
     }
 
 
@@ -23,9 +29,12 @@ public class ControlServiceImpl implements ControlService {
     public AirConditionResponseDTO startAirCondition(Long airConditionId) {
         try{
             AirCondition airCondition = getAirCondition(airConditionId);
-
             airCondition.on();
             airConditionRepository.save(airCondition);
+            kafkaProducerHandler.sendKafkaProducerMessage(
+                    "STATUS",
+                    "ON"
+            );
             return new AirConditionResponseDTO(true, "Air condition started successfully");
         }catch (Exception e) {
             return new AirConditionResponseDTO(false, "Failed to start air condition: " + e.getMessage());
@@ -39,6 +48,12 @@ public class ControlServiceImpl implements ControlService {
 
             airCondition.off();
             airConditionRepository.save(airCondition);
+
+            kafkaProducerHandler.sendKafkaProducerMessage(
+                    "STATUS",
+                    "OFF"
+            );
+
             return new AirConditionResponseDTO(true, "Air condition stopped successfully");
         } catch (Exception e) {
             return new AirConditionResponseDTO(false, "Failed to stop air condition: " + e.getMessage());
@@ -52,6 +67,12 @@ public class ControlServiceImpl implements ControlService {
 
             airCondition.increaseTemperature();
             airConditionRepository.save(airCondition);
+
+            kafkaProducerHandler.sendKafkaProducerMessage(
+                    "TEMPERATURE",
+                    String.valueOf(airCondition.getTemperature())
+            );
+
             return new AirConditionResponseDTO(true, "Temperature increased successfully");
         } catch (Exception e) {
             return new AirConditionResponseDTO(false, "Failed to increase temperature: " + e.getMessage());
@@ -65,6 +86,12 @@ public class ControlServiceImpl implements ControlService {
 
             airCondition.decreaseTemperature();
             airConditionRepository.save(airCondition);
+
+            kafkaProducerHandler.sendKafkaProducerMessage(
+                    "TEMPERATURE",
+                    String.valueOf(airCondition.getTemperature())
+            );
+
             return new AirConditionResponseDTO(true, "Temperature decreased successfully");
         } catch (Exception e) {
             return new AirConditionResponseDTO(false, "Failed to decrease temperature: " + e.getMessage());
@@ -79,6 +106,11 @@ public class ControlServiceImpl implements ControlService {
             airCondition.setWind(nextWind(airCondition.getWind()));
             airCondition.setLastUpdated(LocalDateTime.now());
             airConditionRepository.save(airCondition);
+
+            kafkaProducerHandler.sendKafkaProducerMessage(
+                    "WIND",
+                    airCondition.getWind()
+            );
             return new AirConditionResponseDTO(true, "Wind direction set to UP successfully");
         } catch (Exception e) {
             return new AirConditionResponseDTO(false, "Failed to set wind direction: " + e.getMessage());
@@ -93,6 +125,11 @@ public class ControlServiceImpl implements ControlService {
             airCondition.setWind(previousWind(airCondition.getWind()));
             airCondition.setLastUpdated(LocalDateTime.now());
             airConditionRepository.save(airCondition);
+
+            kafkaProducerHandler.sendKafkaProducerMessage(
+                    "WIND",
+                    airCondition.getWind()
+            );
             return new AirConditionResponseDTO(true, "Wind direction set to DOWN successfully");
         } catch (Exception e) {
             return new AirConditionResponseDTO(false, "Failed to set wind direction: " + e.getMessage());

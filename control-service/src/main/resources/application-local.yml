@@ -19,6 +19,11 @@ spring:
     hibernate:
       ddl-auto: update
     show-sql: true
+  kafka:
+    bootstrap-servers: indie7942.store:9092
+    topic:
+      name: alarm-topic
+
 
 eureka:
   client:
