@@ -6,12 +6,12 @@ spring:
     activate:
       on-profile: local
   application:
-    name: controller-service
+    name: control-service
   datasource:
     driver-class-name: org.postgresql.Driver
     url: jdbc:postgresql://localhost:5432/controller-msa
     username: postgres
-    password: 1696435
+    password: 1234
   jpa:
     database: postgresql
     database-platform: org.hibernate.dialect.PostgreSQLDialect
