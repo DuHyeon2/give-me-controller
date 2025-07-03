@@ -26,6 +26,8 @@ public class AirCondition {
 
     private LocalDateTime lastUpdated;
 
+    private String nickname;
+
     public void on() {
         this.status = "ON";
         this.lastUpdated = LocalDateTime.now();

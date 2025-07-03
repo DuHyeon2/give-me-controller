@@ -18,6 +18,8 @@ public class WebsocketConfig implements WebSocketConfigurer {
     @Override
     public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
         registry.addHandler(websocketHandler, "/ws-endpoint")
+                .setAllowedOriginPatterns("*")
+                .setAllowedOrigins("*")
                 .addInterceptors(new IpHandshakeInterceptor())
                 .setAllowedOriginPatterns("*");
 

@@ -3,6 +3,7 @@ package com.duhyeon.tempservice.service.impl;
 import com.duhyeon.tempservice.dto.AirConditionResponseDTO;
 import com.duhyeon.tempservice.repository.AirConditionRepository;
 import com.duhyeon.tempservice.service.TempService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
@@ -10,6 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+@Slf4j
 @Service
 public class TempServiceImpl implements TempService {
 
@@ -58,6 +60,8 @@ public class TempServiceImpl implements TempService {
         List<SseEmitter> deadEmitters = new ArrayList<>();
         for (SseEmitter emitter : emitters) {
             try {
+                log.info("Broadcasting air condition status to emitter: {}", emitter);
+                log.info("Current air condition: {}", currentAirCondition.getTemperature());
                 emitter.send(SseEmitter.event().name("status").data(currentAirCondition));
             } catch (Exception e) {
                 deadEmitters.add(emitter);
@@ -65,7 +69,4 @@ public class TempServiceImpl implements TempService {
         }
         emitters.removeAll(deadEmitters);
     }
-
-
-
 }

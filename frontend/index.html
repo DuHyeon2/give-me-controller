@@ -66,7 +66,7 @@
   <button onclick="powerToggle()">전원</button>
 </div>
 <div class="state-box">
-  에어컨 상태: <span id="state">OFF</span>
+  에어컨 상태: <span id="status">OFF</span>
 </div>
 <div class="button-group">
   <button onclick="tempDown()">온도 ▼</button>
@@ -81,27 +81,114 @@
 <div class="chat-box" id="chatBox">
   <!-- 대화 메시지 출력 -->
 </div>
+<div style="width:350px; display:flex; gap:8px; margin-top:8px;">
+  <input
+    type="text"
+    id="chatInput"
+    placeholder="메시지를 입력하세요"
+    style="flex:1; padding:8px; border-radius:6px; border:1px solid #dde3ea; font-size:1em;"
+    onkeydown="if(event.key==='Enter'){sendChat();}"
+    autocomplete="off"
+  />
+  <button onclick="sendChat()" style="background:#45c06a;">전송</button>
+</div>
 
 <script>
 
-  document.addEventListener('DOMContentLoaded', () => {
-    let host = window.location.host;
-    let protocol = window.location.protocol === 'https:' ? 'wss://' : 'ws://';
-    let wsUrl = `${protocol}${host}/ws`;
+  const ENV = "local"; // or "prod"
 
-    // WebSocket 연결 (실제 환경에서는 서버 URL에 맞게 수정 필요)
-    const ws = new WebSocket(wsUrl);
-    ws.onopen = () => {
-      console.log('WebSocket 연결 성공');
-      addChat('서버에 연결되었습니다.');
-    };
+  let url = "";
+
+  let nickname = "";
+
+  let chattingWs = null;
+  
+  if(ENV === "local") {
+    url = "http://localhost:8080";
+  } else {
+    url = "https://prod.example.com";
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    let wsUrl = url.replace("http://", "ws://").replace("https://", "wss://")+"/alarm-service/ws-endpoint";
+    let sseUrl = url+"/temp-service/sse/air-condition";
+
+    chattingWs = connectWebsocket(wsUrl);
+    connectSSE(sseUrl);
+
+    let statusUrl = `${url}/temp-service/temp/air-condition`;
+    fetch(statusUrl)
+      .then(response => response.json())
+      .then(data => {
+        updateStatus(data.status, data.temperature, data.wind);
+      })
+      .catch(error => console.error("상태 조회 오류:", error));
 
   });
 
-  // (실제 환경에서는 WebSocket 연결 후 메시지 송수신 처리)
-  let state = 'OFF';
-  let temp = 24;
-  let wind = 2;
+  function updateStatus(status, tempValue, windValue) {
+    const statusElement = document.getElementById('status');
+    const tempElement = document.getElementById('temp');
+    const windElement = document.getElementById('wind');
+
+    statusElement.textContent = status;
+    tempElement.textContent = tempValue;
+    windElement.textContent = windValue;
+
+    // 상태에 따라 이미지 변경
+    const airconImg = document.querySelector('.aircon-img');
+    if (status === "ON") {
+      airconImg.src = "img/air-conditioner.png"; // 켜진 이미지
+    } else {
+      airconImg.src = "img/air-conditioner.png"; // 꺼진 이미지
+    }
+  }
+
+  function connectWebsocket(url) {
+    const ws = new WebSocket(url);
+    ws.onopen = () => console.log("WebSocket 연결됨!");
+    ws.onmessage = (event) => {
+      const data = JSON.parse(event.data);
+      if(data.type === "ping") {
+        return; // ping 메시지는 무시
+      } else if(data.type === "nickname") {
+        nickname = data.nickname;
+      }else if(data.type === "chat") {
+        let nickname = data.nickname;
+        let message = data.message;
+        addChat(`👤 ${nickname}: ${message}`);
+      } else if(data.type === "notice") {
+        let key = data.key;
+        let value = data.value;
+        let nickname = value.split(":")[0];
+        let content = value.split(":")[1];
+        let message = "";
+        if(key === "STATUS") {
+          message = `${nickname} 님이 에어컨을 ${content === "ON" ? "켰습니다" : "껐습니다"}.`;
+        } else if(key === "TEMPERATURE") {
+          message = `${nickname} 님이 온도를 ${content}℃로 설정했습니다.`;
+        } else if(key === "WIND") {
+          message = `${nickname} 님이 바람 세기를 ${content}으로 설정했습니다.`;
+        }
+        addChat(message);
+      }
+    };
+    ws.onerror = (e) => console.error("에러", e);
+    ws.onclose = () => console.log("닫힘");
+    return ws;
+  }
+
+  function connectSSE(url) {
+    const eventSource = new EventSource(url);
+    eventSource.onopen = () => console.log("SSE 연결됨!");
+    eventSource.addEventListener("status", (event) => {
+      const data = JSON.parse(event.data);
+      updateStatus(data.status, data.temperature, data.wind);
+    });
+    eventSource.onerror = (e) => console.error("SSE 에러", e);
+    eventSource.onclose = () => console.log("SSE 닫힘");
+    return eventSource;
+  }
 
   function addChat(msg) {
     const chatBox = document.getElementById('chatBox');
@@ -112,6 +199,16 @@
     chatBox.scrollTop = chatBox.scrollHeight;
   }
 
+  function sendChat() {
+    const input = document.getElementById('chatInput');
+    const msg = input.value.trim();
+    if (msg) {
+      chattingWs.send(msg);
+      input.value = '';
+    }
+    input.focus();
+  }
+
   function updateView() {
     document.getElementById('state').textContent = state;
     document.getElementById('temp').textContent = temp;
@@ -119,42 +216,75 @@
   }
 
   function powerToggle() {
-    state = (state === 'ON') ? 'OFF' : 'ON';
-    addChat(`전원 버튼을 눌러 에어컨을 ${state}으로 변경했습니다.`);
-    updateView();
-    // WebSocket/SSE 등으로 서버에 명령 전송 로직 추가!
+    const statusValue = document.getElementById('status').textContent;
+    const apiUrl = `${url}/control-service/control/1/status/${statusValue === 'ON' ? 'off' : 'on'}`;
+    fetch(apiUrl, { 
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: nickname  
+    })
+      .then(response => response.json())
+      .catch(error => console.error("오류 발생:", error));
   }
 
   function tempUp() {
-    if (state === 'ON') {
-      temp++;
-      addChat(`온도를 ${temp}℃로 올렸습니다.`);
-      updateView();
-    }
+    const apiUrl = `${url}/control-service/control/1/temperature/up`;
+    fetch(apiUrl, { 
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: nickname
+    })
+      .then(response => response.json())
+      .then(data => console.log("서버 응답:", data))
+      .catch(error => console.error("오류 발생:", error));
   }
 
+
   function tempDown() {
-    if (state === 'ON') {
-      temp--;
-      addChat(`온도를 ${temp}℃로 내렸습니다.`);
-      updateView();
-    }
+    const apiUrl = `${url}/control-service/control/1/temperature/down`;
+    fetch(apiUrl, { 
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: nickname
+    })
+      .then(response => response.json())
+      .then(data => console.log("서버 응답:", data))
+      .catch(error => console.error("오류 발생:", error));  
   }
 
   function windUp() {
-    if (state === 'ON' && wind < 5) {
-      wind++;
-      addChat(`바람 세기를 ${wind}로 올렸습니다.`);
-      updateView();
-    }
+    const apiUrl = `${url}/control-service/control/1/wind/up`;
+    fetch(apiUrl, { 
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: nickname
+    })
+      .then(response => response.json())
+      .then(data => console.log("서버 응답:", data))
+      .catch(error => console.error("오류 발생:", error));
+  
   }
 
   function windDown() {
-    if (state === 'ON' && wind > 1) {
-      wind--;
-      addChat(`바람 세기를 ${wind}로 내렸습니다.`);
-      updateView();
-    }
+    const apiUrl = `${url}/control-service/control/1/wind/down`;
+    fetch(apiUrl, { 
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: nickname
+    })
+      .then(response => response.json())
+      .then(data => console.log("서버 응답:", data))
+      .catch(error => console.error("오류 발생:", error));
   }
 
   // 실제 실시간 메시지 수신(WebSocket/SSE)은 아래에 추가!

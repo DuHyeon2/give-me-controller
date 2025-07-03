@@ -20,34 +20,34 @@ public class ControlController {
         return "Control Service is running";
     }
 
-    @PatchMapping("/{id}/status/on")
-    public ResponseEntity<AirConditionResponseDTO> startAirCondition(@PathVariable("id") Long id) {
-        return ResponseEntity.ok(controlService.startAirCondition(id));
+    @PutMapping("/{id}/status/on")
+    public ResponseEntity<AirConditionResponseDTO> startAirCondition(@PathVariable("id") Long id, @RequestBody String nickname) {
+        return ResponseEntity.ok(controlService.startAirCondition(id, nickname));
     }
 
-    @PatchMapping("/{id}/status/off")
-    public ResponseEntity<AirConditionResponseDTO> stopAirCondition(@PathVariable("id") Long id) {
-        return ResponseEntity.ok(controlService.stopAirCondition(id));
+    @PutMapping("/{id}/status/off")
+    public ResponseEntity<AirConditionResponseDTO> stopAirCondition(@PathVariable("id") Long id, @RequestBody String nickname) {
+        return ResponseEntity.ok(controlService.stopAirCondition(id, nickname));
     }
 
-    @PatchMapping("/{id}/temperature/up")
-    public ResponseEntity<AirConditionResponseDTO> upTemperature(@PathVariable("id") Long id) {
-        return ResponseEntity.ok(controlService.upTempAirCondition(id));
+    @PutMapping("/{id}/temperature/up")
+    public ResponseEntity<AirConditionResponseDTO> upTemperature(@PathVariable("id") Long id, @RequestBody String nickname) {
+        return ResponseEntity.ok(controlService.upTempAirCondition(id, nickname));
     }
 
-    @PatchMapping("/{id}/temperature/down")
-    public ResponseEntity<AirConditionResponseDTO> downTemperature(@PathVariable("id") Long id) {
-        return ResponseEntity.ok(controlService.downTempAirCondition(id));
+    @PutMapping("/{id}/temperature/down")
+    public ResponseEntity<AirConditionResponseDTO> downTemperature(@PathVariable("id") Long id, @RequestBody String nickname) {
+        return ResponseEntity.ok(controlService.downTempAirCondition(id, nickname));
     }
 
-    @PatchMapping("/{id}/wind/up")
-    public ResponseEntity<AirConditionResponseDTO> upWind(@PathVariable("id") Long id) {
-        return ResponseEntity.ok(controlService.upWindAirCondition(id));
+    @PutMapping("/{id}/wind/up")
+    public ResponseEntity<AirConditionResponseDTO> upWind(@PathVariable("id") Long id, @RequestBody String nickname) {
+        return ResponseEntity.ok(controlService.upWindAirCondition(id, nickname));
     }
 
-    @PatchMapping("/{id}/wind/down")
-    public ResponseEntity<AirConditionResponseDTO> downWind(@PathVariable("id") Long id) {
-        return ResponseEntity.ok(controlService.downWindAirCondition(id));
+    @PutMapping("/{id}/wind/down")
+    public ResponseEntity<AirConditionResponseDTO> downWind(@PathVariable("id") Long id, @RequestBody String nickname) {
+        return ResponseEntity.ok(controlService.downWindAirCondition(id, nickname));
     }
 
 }

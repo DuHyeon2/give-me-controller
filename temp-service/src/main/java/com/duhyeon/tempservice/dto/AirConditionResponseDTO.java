@@ -26,4 +26,6 @@ public class AirConditionResponseDTO {
 
     private LocalDateTime lastUpdated;
 
+    private String nickname;
+
 }

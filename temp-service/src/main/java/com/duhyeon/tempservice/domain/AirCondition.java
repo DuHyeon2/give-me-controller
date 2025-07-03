@@ -27,6 +27,8 @@ public class AirCondition {
 
     private LocalDateTime lastUpdated;
 
+    private String nickname;
+
     public AirConditionResponseDTO toResponseDTO() {
         return AirConditionResponseDTO.builder()
                 .airConditionId(this.airConditionId)
@@ -35,6 +37,7 @@ public class AirCondition {
                 .wind(this.wind)
                 .temperature(this.temperature)
                 .lastUpdated(this.lastUpdated)
+                .nickname(this.nickname)
                 .build();
     }
 }

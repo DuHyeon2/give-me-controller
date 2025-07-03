@@ -22,7 +22,7 @@ public class KafkaConsumerHandler {
         log.info("Kafka message received. key: {}, value: {}", key, value);
 
         try {
-            websocketHandler.allSend(value);
+            websocketHandler.noticeSend(key, value);
         } catch (Exception e) {
             log.error("Error sending message to WebSocket sessions: {}", e.getMessage());
         }

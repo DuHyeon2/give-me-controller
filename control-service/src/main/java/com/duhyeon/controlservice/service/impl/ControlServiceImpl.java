@@ -26,14 +26,15 @@ public class ControlServiceImpl implements ControlService {
 
 
     @Override
-    public AirConditionResponseDTO startAirCondition(Long airConditionId) {
+    public AirConditionResponseDTO startAirCondition(Long airConditionId, String nickname) {
         try{
             AirCondition airCondition = getAirCondition(airConditionId);
+            airCondition.setNickname(nickname);
             airCondition.on();
             airConditionRepository.save(airCondition);
             kafkaProducerHandler.sendKafkaProducerMessage(
                     "STATUS",
-                    "ON"
+                    nickname + ":ON"
             );
             return new AirConditionResponseDTO(true, "Air condition started successfully");
         }catch (Exception e) {
@@ -42,16 +43,16 @@ public class ControlServiceImpl implements ControlService {
     }
 
     @Override
-    public AirConditionResponseDTO stopAirCondition(Long airConditionId) {
+    public AirConditionResponseDTO stopAirCondition(Long airConditionId, String nickname) {
         try {
             AirCondition airCondition = getAirCondition(airConditionId);
-
+            airCondition.setNickname(nickname);
             airCondition.off();
             airConditionRepository.save(airCondition);
 
             kafkaProducerHandler.sendKafkaProducerMessage(
                     "STATUS",
-                    "OFF"
+                    nickname + ":OFF"
             );
 
             return new AirConditionResponseDTO(true, "Air condition stopped successfully");
@@ -61,16 +62,16 @@ public class ControlServiceImpl implements ControlService {
     }
 
     @Override
-    public AirConditionResponseDTO upTempAirCondition(Long airConditionId) {
+    public AirConditionResponseDTO upTempAirCondition(Long airConditionId, String nickname) {
         try {
             AirCondition airCondition = getAirCondition(airConditionId);
-
+            airCondition.setNickname(nickname);
             airCondition.increaseTemperature();
             airConditionRepository.save(airCondition);
 
             kafkaProducerHandler.sendKafkaProducerMessage(
                     "TEMPERATURE",
-                    String.valueOf(airCondition.getTemperature())
+                    nickname + ":" + airCondition.getTemperature()
             );
 
             return new AirConditionResponseDTO(true, "Temperature increased successfully");
@@ -80,16 +81,16 @@ public class ControlServiceImpl implements ControlService {
     }
 
     @Override
-    public AirConditionResponseDTO downTempAirCondition(Long airConditionId) {
+    public AirConditionResponseDTO downTempAirCondition(Long airConditionId, String nickname) {
         try {
             AirCondition airCondition = getAirCondition(airConditionId);
-
+            airCondition.setNickname(nickname);
             airCondition.decreaseTemperature();
             airConditionRepository.save(airCondition);
 
             kafkaProducerHandler.sendKafkaProducerMessage(
                     "TEMPERATURE",
-                    String.valueOf(airCondition.getTemperature())
+                    nickname + ":" + airCondition.getTemperature()
             );
 
             return new AirConditionResponseDTO(true, "Temperature decreased successfully");
@@ -99,17 +100,17 @@ public class ControlServiceImpl implements ControlService {
     }
 
     @Override
-    public AirConditionResponseDTO upWindAirCondition(Long airConditionId) {
+    public AirConditionResponseDTO upWindAirCondition(Long airConditionId, String nickname) {
         try {
             AirCondition airCondition = getAirCondition(airConditionId);
-
+            airCondition.setNickname(nickname);
             airCondition.setWind(nextWind(airCondition.getWind()));
             airCondition.setLastUpdated(LocalDateTime.now());
             airConditionRepository.save(airCondition);
 
             kafkaProducerHandler.sendKafkaProducerMessage(
                     "WIND",
-                    airCondition.getWind()
+                    nickname + ":" + airCondition.getWind()
             );
             return new AirConditionResponseDTO(true, "Wind direction set to UP successfully");
         } catch (Exception e) {
@@ -118,17 +119,17 @@ public class ControlServiceImpl implements ControlService {
     }
 
     @Override
-    public AirConditionResponseDTO downWindAirCondition(Long airConditionId) {
+    public AirConditionResponseDTO downWindAirCondition(Long airConditionId, String nickname) {
         try {
             AirCondition airCondition = getAirCondition(airConditionId);
-
+            airCondition.setNickname(nickname);
             airCondition.setWind(previousWind(airCondition.getWind()));
             airCondition.setLastUpdated(LocalDateTime.now());
             airConditionRepository.save(airCondition);
 
             kafkaProducerHandler.sendKafkaProducerMessage(
                     "WIND",
-                    airCondition.getWind()
+                    nickname + ":" + airCondition.getWind()
             );
             return new AirConditionResponseDTO(true, "Wind direction set to DOWN successfully");
         } catch (Exception e) {

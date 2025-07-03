@@ -14,10 +14,16 @@ spring:
             cors-configurations:
               '[/**]':
                 allowedOrigins:
-                  - 'http://localhost:3000'
-                  # - 'https://www.example.com'
-                allowedMethods: '*'
-                allowedHeaders: '*'
+                  - '*'
+                allowedMethods:
+                  - GET
+                  - POST
+                  - PUT
+                  - PATCH
+                  - DELETE
+                  - OPTIONS
+                allowedHeaders:
+                  - '*'
                 allowedCredentials: true
           # 라우팅 설정
           routes:
