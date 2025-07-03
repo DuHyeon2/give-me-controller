@@ -7,6 +7,7 @@ import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
 
+import java.net.InetAddress;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
@@ -20,7 +21,12 @@ public class WebsocketHandler extends TextWebSocketHandler {
         // 클라이언트가 연결되었을 때 호출되는 메서드
         super.afterConnectionEstablished(session);
         sessions.add(session); // 세션을 리스트에 추가
-        log.info("WebSocket connection established: {}", session.getId());
+        InetAddress clientIp = null;
+        if (session.getRemoteAddress() != null) {
+            clientIp = session.getRemoteAddress().getAddress();
+        }
+
+        log.info("WebSocket connection established: session={}, ip={}", session.getId(), clientIp);
     }
 
     public void afterConnectionClosed(WebSocketSession session, CloseStatus status) throws Exception {

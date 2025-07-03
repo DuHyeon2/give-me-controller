@@ -3,7 +3,7 @@ spring:
     activate:
       on-profile: local
   application:
-    name: control-service
+    name: temp-service
   datasource:
     driver-class-name: org.postgresql.Driver
     url: jdbc:postgresql://localhost:5432/controller-msa
@@ -18,6 +18,9 @@ spring:
     show-sql: true
   kafka:
     bootstrap-servers: indie7942.store:9092
+    consumer:
+      group-id: alarm-group
+      auto-offset-reset: earliest
     topic:
       name: alarm-topic
 

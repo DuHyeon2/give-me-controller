@@ -1,10 +1,43 @@
-server:
-  port: 8761
-
 spring:
+  config:
+    activate:
+      on-profile: local
   application:
     name: apigateway-service
-eureka:
-  client:
-    register-with-eureka: false
-    fetch-registry: false
+
+  cloud:
+    gateway:
+      server:
+        webflux:
+          # CORS 설정 (globalcors → server.webflux.globalcors)
+          globalcors:
+            cors-configurations:
+              '[/**]':
+                allowedOrigins:
+                  - 'http://localhost:3000'
+                  # - 'https://www.example.com'
+                allowedMethods: '*'
+                allowedHeaders: '*'
+                allowedCredentials: true
+          # 라우팅 설정
+          routes:
+            - id: control-service
+              predicates:
+                - Path=/control-service/**
+              filters:
+                - StripPrefix=1
+              uri: lb://control-service
+
+            - id: alarm-service
+              predicates:
+                - Path=/alarm-service/**
+              filters:
+                - StripPrefix=1
+              uri: lb://alarm-service
+
+            - id: temp-service
+              predicates:
+                - Path=/temp-service/**
+              filters:
+                - StripPrefix=1
+              uri: lb://temp-service

@@ -6,13 +6,18 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/control-service")
+@RequestMapping("/control")
 public class ControlController {
 
     private final ControlService controlService;
 
     public ControlController(ControlService controlService) {
         this.controlService = controlService;
+    }
+
+    @GetMapping("/health")
+    public String getServiceInfo() {
+        return "Control Service is running";
     }
 
     @PatchMapping("/{id}/status/on")
