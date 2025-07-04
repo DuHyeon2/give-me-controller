@@ -1,14 +1,13 @@
 package com.duhyeon.alarmservice.config;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.springframework.http.server.ServerHttpRequest;
 import org.springframework.http.server.ServerHttpResponse;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.socket.WebSocketHandler;
 import org.springframework.web.socket.server.HandshakeInterceptor;
-import org.json.JSONArray;
-import org.json.JSONObject;
 
-import java.net.InetSocketAddress;
 import java.util.Map;
 
 public class IpHandshakeInterceptor implements HandshakeInterceptor {
@@ -49,6 +48,5 @@ public class IpHandshakeInterceptor implements HandshakeInterceptor {
             // 실패하면 기본 닉네임 반환
             return "익명 유저";
         }
-
     }
 }
