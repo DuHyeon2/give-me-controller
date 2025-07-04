@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
         - name: frontend-container
-          image: <YOUR_DOCKERHUB_ID>/frontend:latest
+          image: 635133683541.dkr.ecr.ap-northeast-2.amazonaws.com/frontend:latest
           ports:
             - containerPort: 80
           resources:
