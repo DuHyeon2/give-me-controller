@@ -1,16 +1,15 @@
 eureka:
   client:
-    serviceUrl:
-      defaultZone: http://localhost:8761/eureka/
+    enabled: false
 
 spring:
   config:
     activate:
-      on-profile: local
+      on-profile: prod
   application:
     name: alarm-service
   kafka:
-    bootstrap-servers: indie7942.store:9092
+    bootstrap-servers: kafka-service:9092
     consumer:
       group-id: alarm-group
       auto-offset-reset: earliest

@@ -1,11 +1,32 @@
-server:
-  port: 8081
-
-spring:
-  application:
-    name: controller-service
-
 eureka:
   client:
-    register-with-eureka: false
-    fetch-registry: false
+    enabled: false
+
+spring:
+  config:
+    activate:
+      on-profile: prod
+  application:
+    name: temp-service
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://${DB_HOST}:5432/controller-msa
+    username: postgres
+    password: ${DB_PW}
+  jpa:
+    database: postgresql
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    generate-ddl: true
+    hibernate:
+      ddl-auto: create
+    show-sql: true
+  kafka:
+    bootstrap-servers: kafka-service:9092
+    consumer:
+      group-id: temp-group
+      auto-offset-reset: earliest
+    topic:
+      name: alarm-topic
+
+server:
+  port: 0

@@ -18,11 +18,6 @@ public class TempController {
         this.tempService = tempService;
     }
 
-    @GetMapping("/health")
-    public String getServiceInfo() {
-        return "Temp Service is running";
-    }
-
     @GetMapping("/air-condition")
     public ResponseEntity<AirConditionResponseDTO> getAirCondition() {
 

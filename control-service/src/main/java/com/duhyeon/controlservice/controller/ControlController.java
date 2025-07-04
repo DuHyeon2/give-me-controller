@@ -15,11 +15,6 @@ public class ControlController {
         this.controlService = controlService;
     }
 
-    @GetMapping("/health")
-    public String getServiceInfo() {
-        return "Control Service is running";
-    }
-
     @PutMapping("/{id}/status/on")
     public ResponseEntity<AirConditionResponseDTO> startAirCondition(@PathVariable("id") Long id, @RequestBody String nickname) {
         return ResponseEntity.ok(controlService.startAirCondition(id, nickname));

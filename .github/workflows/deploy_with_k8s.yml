@@ -1,0 +1,119 @@
+name: deploy give-me-controller backend
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout github
+        uses: actions/checkout@v2
+      
+      - name: install kubectl
+        uses: azure/setup-kubectl@v3
+        with:
+          version: "v1.25.9"
+        id: install
+        
+      - name: configure aws
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_KEY }}
+          aws-secret-access-key:  ${{ secrets.AWS_SECRET }}
+          aws-region: ap-northeast-2
+
+      - name: update cluster infomation
+        run: aws eks update-kubeconfig --name duhyeon-cluster --region ap-northeast-2
+
+      - name: Login to ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v1
+
+      # apigateway-service
+      - name: gateway build and push docker image to ecr
+        env:
+          REGISTRY: 635133683541.dkr.ecr.ap-northeast-2.amazonaws.com
+          REPOSITORY: apigateway
+          IMAGE_TAG: latest
+        run: |
+          docker build \
+          -t $REGISTRY/$REPOSITORY:$IMAGE_TAG \
+          -f ./apigateway-service/Dockerfile ./apigateway-service
+          docker push $REGISTRY/$REPOSITORY:$IMAGE_TAG
+
+      - name: eks kubectl apply
+        run: |
+          kubectl apply -f ./apigateway-service/k8s/deployment-svc.yml
+          kubectl rollout restart deployment apigateway-deployment -n duhyeon
+      
+      # alarm-service
+      - name: alarm build and push docker image to ecr
+        env:
+          REGISTRY: 635133683541.dkr.ecr.ap-northeast-2.amazonaws.com
+          REPOSITORY: alarm-service
+          IMAGE_TAG: latest
+        run: |
+          docker build \
+          -t $REGISTRY/$REPOSITORY:$IMAGE_TAG \
+          -f ./alarm-service/Dockerfile ./alarm-service
+          docker push $REGISTRY/$REPOSITORY:$IMAGE_TAG
+
+      - name: eks kubectl apply
+        run: |
+          kubectl apply -f ./alarm-service/k8s/deployment-svc.yml
+          kubectl rollout restart deployment alarm-deployment -n duhyeon
+
+      # control-service
+      - name: control build and push docker image to ecr
+        env:
+          REGISTRY: 635133683541.dkr.ecr.ap-northeast-2.amazonaws.com
+          REPOSITORY: control-service
+          IMAGE_TAG: latest
+        run: |
+          docker build \
+          -t $REGISTRY/$REPOSITORY:$IMAGE_TAG \
+          -f ./control-service/Dockerfile ./control-service
+          docker push $REGISTRY/$REPOSITORY:$IMAGE_TAG
+  
+      - name: eks kubectl apply
+        run: |
+          kubectl apply -f ./control-service/k8s/deployment-svc.yml
+          kubectl rollout restart deployment control-deployment -n duhyeon
+
+      # temp-service
+      - name: temp build and push docker image to ecr
+        env:
+          REGISTRY: 635133683541.dkr.ecr.ap-northeast-2.amazonaws.com
+          REPOSITORY: temp-service
+          IMAGE_TAG: latest
+        run: |
+          docker build \
+          -t $REGISTRY/$REPOSITORY:$IMAGE_TAG \
+          -f ./temp-service/Dockerfile ./temp-service
+          docker push $REGISTRY/$REPOSITORY:$IMAGE_TAG
+  
+      - name: eks kubectl apply
+        run: |
+          kubectl apply -f ./temp-service/k8s/deployment-svc.yml
+          kubectl rollout restart deployment temp-deployment -n duhyeon
+
+      
+      # frontend
+      - name: frontend build and push docker image to ecr
+        env:
+          REGISTRY: 635133683541.dkr.ecr.ap-northeast-2.amazonaws.com
+          REPOSITORY: frontend
+          IMAGE_TAG: latest
+        run: |
+          docker build \
+          -t $REGISTRY/$REPOSITORY:$IMAGE_TAG \
+          -f ./frontend/Dockerfile ./frontend
+          docker push $REGISTRY/$REPOSITORY:$IMAGE_TAG
+
+      - name: eks kubectl apply
+        run: |
+          kubectl apply -f ./frontend/k8s/deployment-svc.yml
+          kubectl rollout restart deployment frontend-deployment -n duhyeon

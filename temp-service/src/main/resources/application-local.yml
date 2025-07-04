@@ -1,3 +1,8 @@
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://localhost:8761/eureka/
+
 spring:
   config:
     activate:
@@ -23,11 +28,6 @@ spring:
       auto-offset-reset: earliest
     topic:
       name: alarm-topic
-
-eureka:
-  client:
-    serviceUrl:
-      defaultZone: http://localhost:8761/eureka/
 
 server:
   port: 0

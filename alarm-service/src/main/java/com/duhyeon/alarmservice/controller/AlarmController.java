@@ -7,8 +7,4 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/alarm")
 public class AlarmController {
 
-    @RequestMapping("/health")
-    public String getServiceInfo() {
-        return "Alarm Service is running";
-    }
 }

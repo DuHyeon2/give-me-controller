@@ -1,14 +1,14 @@
 eureka:
   client:
-    serviceUrl:
-      defaultZone: http://localhost:8761/eureka/
+    enabled: false
 
 spring:
   config:
     activate:
-      on-profile: local
+      on-profile: prod
   application:
     name: apigateway-service
+
   cloud:
     gateway:
       server:
@@ -36,21 +36,21 @@ spring:
                 - Path=/control-service/**
               filters:
                 - StripPrefix=1
-              uri: lb://control-service
+              uri: http://control-service
 
             - id: alarm-service
               predicates:
                 - Path=/alarm-service/**
               filters:
                 - StripPrefix=1
-              uri: lb://alarm-service
+              uri: http://alarm-service
 
             - id: temp-service
               predicates:
                 - Path=/temp-service/**
               filters:
                 - StripPrefix=1
-              uri: lb://temp-service
+              uri: http://temp-service
 
             - id: frontend
               predicates:
