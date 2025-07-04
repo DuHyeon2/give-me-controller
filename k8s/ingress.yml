@@ -17,6 +17,13 @@ spec:
   - host: server.duhyeon.shop  # 설정하려는 도메인 이름. 제외시에 elb주소로도 접근할수 있는 모든 도메인 접근 가능.
     http:
       paths:
+      - path: /frontend/**  # `/frontend/**` 경로를 `frontend-service`로 라우팅
+        pathType: Prefix
+        backend:
+          service:
+            name: frontend-service
+            port:
+              number: 80
       - path: / #모든 url요청을 apigateway-service로 라우팅
         pathType: Prefix
         backend:

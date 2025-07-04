@@ -31,6 +31,12 @@ spring:
                 allowedCredentials: true
           # 라우팅 설정
           routes:
+            - id: frontend
+              predicates:
+                - Path=/**
+                - Path=/img/**
+              uri: lb://frontend-service:80
+
             - id: control-service
               predicates:
                 - Path=/control-service/**
@@ -52,8 +58,3 @@ spring:
                 - StripPrefix=1
               uri: lb://temp-service
 
-            - id: frontend
-              predicates:
-                - Path=/
-                - Path=/img/**
-              uri: http://frontend-service:80

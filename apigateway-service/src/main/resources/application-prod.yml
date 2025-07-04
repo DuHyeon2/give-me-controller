@@ -33,7 +33,6 @@ spring:
           routes:
             - id: frontend
               predicates:
-                - Path=/
                 - Path=/**
                 - Path=/img/**
               uri: http://frontend-service:80
