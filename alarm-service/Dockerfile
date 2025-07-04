@@ -8,6 +8,7 @@ COPY src src
 COPY build.gradle .
 COPY settings.gradle .
 COPY gradlew .
+COPY gradle/wrapper gradle/wrapper
 
 # 빌드
 RUN chmod +x gradlew
