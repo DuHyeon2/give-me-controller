@@ -167,11 +167,12 @@
       } else if(data.type === "nickname") {
         nickname = data.nickname;
       } else if(data.type === "join"){
-        addChat(`👋 ${nickname} 님이 접속했습니다.`);
-      }else if(data.type === "chat") {
-        let nickname = data.nickname;
-        let message = data.message;
-        addChat(`👤 ${nickname}: ${message}`);
+        let joinNickname = data.nickname;
+        addChat(`👋 ${joinNickname} 님이 접속했습니다.`);
+      } else if(data.type === "chat") {
+        let chatNickname = data.nickname;
+        let chatMessage = data.message;
+        addChat(`👤 ${chatNickname}: ${chatMessage}`);
       } else if(data.type === "notice") {
         let key = data.key;
         let value = data.value;
