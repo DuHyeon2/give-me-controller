@@ -25,7 +25,7 @@ spec:
             name: frontend-service
             port:
               number: 80
-      - path: / #모든 url요청을 apigateway-service로 라우팅
+      - path: /api #모든 url요청을 apigateway-service로 라우팅
         pathType: Prefix
         backend:
           service:

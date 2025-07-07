@@ -33,21 +33,21 @@ spring:
           routes:
             - id: control-service
               predicates:
-                - Path=/control-service/**
+                - Path=/api/control-service/**
               filters:
-                - StripPrefix=1
+                - StripPrefix=2
               uri: http://control-service
 
             - id: alarm-service
               predicates:
-                - Path=/alarm-service/**
+                - Path=/api/alarm-service/**
               filters:
-                - StripPrefix=1
+                - StripPrefix=2
               uri: http://alarm-service
 
             - id: temp-service
               predicates:
-                - Path=/temp-service/**
+                - Path=/api/temp-service/**
               filters:
-                - StripPrefix=1
+                - StripPrefix=2
               uri: http://temp-service
