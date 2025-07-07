@@ -32,7 +32,7 @@ public class WebsocketHandler extends TextWebSocketHandler {
         log.info("현재 연결 세션 수: {}", sessions.size());
 
         session.sendMessage(new TextMessage("{\"type\":\"nickname\",\"nickname\":\"" + nickname + "\"}"));
-
+        joinSend(nickname);
         ScheduledFuture<?> pingTask = scheduler.scheduleAtFixedRate(() -> {
             try {
                 if (session.isOpen()) {
@@ -81,6 +81,17 @@ public class WebsocketHandler extends TextWebSocketHandler {
                 session.sendMessage(new TextMessage(chatMessage));
             } catch (Exception e){
                 log.error("WebSocket 메시지 전송 실패: {}", e.getMessage());
+            }
+        }
+    }
+
+    public void joinSend(String nickname) {
+        String joinMessage = "{\"type\":\"join\",\"nickname\":\"" + nickname + "\"}";
+        for (WebSocketSession session : sessions) {
+            try {
+                session.sendMessage(new TextMessage(joinMessage));
+            } catch (Exception e) {
+                log.error("WebSocket join 메시지 전송 실패: {}", e.getMessage());
             }
         }
     }

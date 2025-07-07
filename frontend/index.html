@@ -166,6 +166,7 @@
         return; // ping 메시지는 무시
       } else if(data.type === "nickname") {
         nickname = data.nickname;
+      } else if(data.type === "join"){
         addChat(`👋 ${nickname} 님이 접속했습니다.`);
       }else if(data.type === "chat") {
         let nickname = data.nickname;
