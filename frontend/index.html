@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8">
-  <title>에어컨 제어 데모</title>
+  <title>Give Me Controller!!</title>
   <style>
     body {
       display: flex;
@@ -17,6 +17,14 @@
       width: 200px;
       margin: 40px 0 20px 0;
       filter: drop-shadow(0 2px 12px #bbb);
+    }
+    .wind-img {
+      display: block;
+      width: 300px;
+      height: 120px; /* 적당히 바람 이미지 높이로 설정 */
+      margin-top: -100px;
+      margin-bottom: 20px;
+      transition: opacity 0.2s;
     }
     .button-group {
       display: flex;
@@ -62,6 +70,7 @@
 </head>
 <body>
 <img class="aircon-img" src="img/air-conditioner.png" alt="에어컨 이미지">
+<img class="wind-img" src="img/wind.png" alt="바람 이미지"/>
 <div class="button-group">
   <button onclick="powerToggle()">전원</button>
 </div>
@@ -78,7 +87,7 @@
   <span class="wind-box">바람 세기: <span id="wind">2</span></span>
   <button onclick="windUp()">바람 ▲</button>
 </div>
-<div class="chat-box" id="chatBox">
+<div style="width:450px;"class="chat-box" id="chatBox">
   <!-- 대화 메시지 출력 -->
 </div>
 <div style="width:350px; display:flex; gap:8px; margin-top:8px;">
@@ -95,7 +104,7 @@
 
 <script>
 
-  const ENV = "prod"; // or "prod"
+  const ENV = "local"; // "local" or "prod"
 
   let url = "";
 
@@ -136,23 +145,28 @@
     windElement.textContent = windValue;
 
     // 상태에 따라 이미지 변경
-    const airconImg = document.querySelector('.aircon-img');
+    const windImg = document.querySelector('.wind-img');
     if (status === "ON") {
-      airconImg.src = "img/air-conditioner.png"; // 켜진 이미지
+      windImg.style.visibility = "visible";
+      windImg.style.opacity = "1";
     } else {
-      airconImg.src = "img/air-conditioner.png"; // 꺼진 이미지
+      windImg.style.visibility = "hidden";
+      windImg.style.opacity = "0";
     }
   }
 
   function connectWebsocket(url) {
     const ws = new WebSocket(url);
-    ws.onopen = () => console.log("WebSocket 연결됨!");
+    ws.onopen = () => {
+      console.log("WebSocket 연결됨!");
+    };
     ws.onmessage = (event) => {
       const data = JSON.parse(event.data);
       if(data.type === "ping") {
         return; // ping 메시지는 무시
       } else if(data.type === "nickname") {
         nickname = data.nickname;
+        addChat(`👋 ${nickname} 님이 접속했습니다.`);
       }else if(data.type === "chat") {
         let nickname = data.nickname;
         let message = data.message;
