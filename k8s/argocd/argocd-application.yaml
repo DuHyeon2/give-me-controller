@@ -1,0 +1,150 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: give-me-controller-argocd
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/DuHyeon2/give-me-controller.git
+    targetRevision: main
+    path: k8s
+  destination:
+  # https://kubernetes.default.svc: 이는 Argo CD 자체가 설치된 클러스터의 내부 주소
+    server: https://kubernetes.default.svc
+    namespace: duhyeon
+  syncPolicy:
+  # Argo CD가 사람이 명령 안 해도 자동으로 GitHub에 있는 매니페스트를 클러스터에 적용
+    automated:
+    # GitHub에서 삭제된 리소스는 클러스터에서도 자동 삭제
+      prune: true
+      # 클러스터 안에서 수동으로 리소스가 변경되면, GitHub에 있는 원래 상태로 자동 복구
+      selfHeal: true
+ 
+# apigateway-argocd.yaml
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: apigateway-argocd
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/DuHyeon2/give-me-controller.git
+    targetRevision: main
+    path: apigateway-service/k8s
+  destination:
+  # https://kubernetes.default.svc: 이는 Argo CD 자체가 설치된 클러스터의 내부 주소
+    server: https://kubernetes.default.svc
+    namespace: duhyeon
+  syncPolicy:
+  # Argo CD가 사람이 명령 안 해도 자동으로 GitHub에 있는 매니페스트를 클러스터에 적용
+    automated:
+    # GitHub에서 삭제된 리소스는 클러스터에서도 자동 삭제
+      prune: true
+      # 클러스터 안에서 수동으로 리소스가 변경되면, GitHub에 있는 원래 상태로 자동 복구
+      selfHeal: true
+ 
+
+# alarm-argocd.yaml
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: alarm-argocd
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/DuHyeon2/give-me-controller.git
+    targetRevision: main
+    path: alarm-service/k8s
+  destination:
+  # https://kubernetes.default.svc: 이는 Argo CD 자체가 설치된 클러스터의 내부 주소
+    server: https://kubernetes.default.svc
+    namespace: duhyeon
+  syncPolicy:
+  # Argo CD가 사람이 명령 안 해도 자동으로 GitHub에 있는 매니페스트를 클러스터에 적용
+    automated:
+    # GitHub에서 삭제된 리소스는 클러스터에서도 자동 삭제
+      prune: true
+      # 클러스터 안에서 수동으로 리소스가 변경되면, GitHub에 있는 원래 상태로 자동 복구
+      selfHeal: true
+ 
+# control-argocd.yaml
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: control-argocd
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/DuHyeon2/give-me-controller.git
+    targetRevision: main
+    path: control-service/k8s
+  destination:
+  # https://kubernetes.default.svc: 이는 Argo CD 자체가 설치된 클러스터의 내부 주소
+    server: https://kubernetes.default.svc
+    namespace: duhyeon
+  syncPolicy:
+  # Argo CD가 사람이 명령 안 해도 자동으로 GitHub에 있는 매니페스트를 클러스터에 적용
+    automated:
+    # GitHub에서 삭제된 리소스는 클러스터에서도 자동 삭제
+      prune: true
+      # 클러스터 안에서 수동으로 리소스가 변경되면, GitHub에 있는 원래 상태로 자동 복구
+      selfHeal: true
+ 
+
+# temp-argocd.yaml
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: temp-argocd
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/DuHyeon2/give-me-controller.git
+    targetRevision: main
+    path: temp-service/k8s
+  destination:
+  # https://kubernetes.default.svc: 이는 Argo CD 자체가 설치된 클러스터의 내부 주소
+    server: https://kubernetes.default.svc
+    namespace: duhyeon
+  syncPolicy:
+  # Argo CD가 사람이 명령 안 해도 자동으로 GitHub에 있는 매니페스트를 클러스터에 적용
+    automated:
+    # GitHub에서 삭제된 리소스는 클러스터에서도 자동 삭제
+      prune: true
+      # 클러스터 안에서 수동으로 리소스가 변경되면, GitHub에 있는 원래 상태로 자동 복구
+      selfHeal: true
+ 
+# frontend-argocd.yaml
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: frontend-argocd
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/DuHyeon2/give-me-controller.git
+    targetRevision: main
+    path: frontend/k8s
+  destination:
+  # https://kubernetes.default.svc: 이는 Argo CD 자체가 설치된 클러스터의 내부 주소
+    server: https://kubernetes.default.svc
+    namespace: duhyeon
+  syncPolicy:
+  # Argo CD가 사람이 명령 안 해도 자동으로 GitHub에 있는 매니페스트를 클러스터에 적용
+    automated:
+    # GitHub에서 삭제된 리소스는 클러스터에서도 자동 삭제
+      prune: true
+      # 클러스터 안에서 수동으로 리소스가 변경되면, GitHub에 있는 원래 상태로 자동 복구
+      selfHeal: true
+ 
